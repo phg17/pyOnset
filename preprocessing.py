@@ -8,6 +8,7 @@ Created on Wed Feb  2 17:22:47 2022
 
 import scipy.signal as signal
 import numpy as np
+from utils import Extract_Arguments, resample_label, Add_Noise
 from python_speech_features import mfcc
 from python_speech_features import delta
 from python_speech_features import logfbank
@@ -51,5 +52,86 @@ def FBank(audio,fs = 16000, win_len = 0.01,winstep = 0.005, nfilt = 26, nfft = 5
     f = np.arange(fbank_feat.shape[0])
     t = np.arange(fbank_feat.shape[1])*winstep
     return f,t,fbank_feat
+
+def Time_diff(feature, n_difference = 1):
+    #Return the Time_Derivative, but can be adjusted to different delays
+    #Made sure that we could not use future data!
+    #feature is a (n_feat,times) matrix
+    feat_diff = np.zeros(feature.shape)
+    feat_diff[:,n_difference:] = feature[:,n_difference:] - feature[:,:-n_difference]
+    return feat_diff
+
+def Resample_features(list_feat):
+    #Resampe the features according to the highest sampling rate
+    #Features need to have (n_components,times) structure
+    n_resample = 0
+    list_resampled_feat = []
+    for feat in list_feat:
+        if feat.shape[1] > n_resample:
+            n_resample = feat.shape[1]
+    for i in range(len(list_feat)):
+        list_resampled_feat.append(signal.resample(list_feat[i], num = n_resample, axis = 1))
+    return list_resampled_feat
+
+def Extract_Feature(audio,fs,arg_dict):
+    #Extract the features from audio and the completed arg_dict
+    if arg_dict['type'] == 'MFCC':
+        feat = MFCC(audio,fs,win_len = arg_dict['win_len'], 
+                    winstep = arg_dict['winstep'], numcep = arg_dict['numcep'], 
+                    delta_f = arg_dict['delta_f'], ndelta = arg_dict['ndelta'])
+    elif arg_dict['type'] == 'FBank':
+        feat = FBank(audio,fs,win_len = arg_dict['win_len'], 
+                    winstep = arg_dict['winstep'], nfilt = arg_dict['nfilt'], 
+                    nfft = arg_dict['nfft'])
+    elif arg_dict['type'] == 'STFT':
+        feat = STFT(audio,fs,window = arg_dict['window'], 
+                    t_seg = arg_dict['t_seg'], 
+                    Bark_scale = arg_dict['Bark_scale'])
+    return feat
+
+
+def Generate_Features(audio, onsets, fs, features_dict, SNR = 9):
+    #Create the feature vectors from the audio sampled at fs
+    #The features_dict contains the arguments for the different features 
+    #the dictionary contains sub-dictionaries
+    #Each sub-dictionary should contain a type category and the different 
+    #arguments for that type
+    #type can be 'MFCC', 'FBank' or 'STFT'
+    audio = Add_Noise(audio, SNR = SNR)
+    features_list = []
+    for feature_key in features_dict:
+        arguments_dict = Extract_Arguments(features_dict[feature_key])
+        f,t,feature = Extract_Feature(audio,fs,arguments_dict)
+        if arguments_dict['difference']:
+            feature = Time_diff(feature,n_difference = arguments_dict['n_difference'])
+        features_list.append(feature)
+    resample_list = Resample_features(features_list)
+    feature_vector = np.vstack(resample_list)
+    onsets_resamp = resample_label(onsets, feature_vector.shape[1],fs)
+    
+    return feature_vector, onsets_resamp
+
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+        
+    
 
 

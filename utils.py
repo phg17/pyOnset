@@ -20,6 +20,17 @@ from python_speech_features import mfcc
 from python_speech_features import delta
 from python_speech_features import logfbank
 
+Default_arg = dict()
+Default_arg['MFCC'] = {'win_len':0.01,'winstep':0.005,'numcep':13,'delta_f':False, 'ndelta':2,
+               'difference':False, 'n_difference' :0}
+Default_arg['FBank'] = {'win_len':0.01,'winstep':0.005,'nfilt':26,'nfft':512,
+               'difference':False, 'n_difference' :0}
+Default_arg['STFT'] = {'window':'hann','t_seg':0.005,
+               'Bark_scale': [0,50,150,250,350,450,570,700,840,1000,1170,
+                              1370,1600,1850,2150,2500,2900,3400,4000,4800,
+                              5800,7000,8500,10500,13500],
+               'difference':False, 'n_difference' :0}
+
 
 def RMS(signal):
     """RMS handler"""
@@ -46,3 +57,21 @@ def resample_label(label, l2 ,samplerate = 16000):
     for i in onsets:
       label_output[i] = 1
     return label_output
+
+def Extract_Arguments(arg_dict):
+    #Return the updated list of arguments based on the type of features
+    #Type can be MFCC, STFT or FBank
+    if arg_dict['type'] not in ['MFCC','FBank','STFT']:
+        raise AssertionError('Type of Feature not supported, try MFCC, FBank or STFT')
+    else:
+        default_arg = Default_arg[arg_dict['type']]
+        for arg_key in default_arg:
+            if arg_key not in arg_dict:
+                arg_dict[arg_key] = default_arg[arg_key]
+    return arg_dict
+
+def Default_Args(feat_type):
+    return Default_arg[feat_type]
+
+
+    
