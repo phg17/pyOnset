@@ -1,3 +1,3 @@
-from . import preprocessing, timit, utils
+from . import timit, utils, preprocessing 
 
-__all__ = ['preprocessing', 'timit', 'utils']
+__all__ = ['timit', 'utils','preprocessing',]
