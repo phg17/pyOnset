@@ -12,6 +12,7 @@ from .utils import Extract_Arguments, resample_label, Add_Noise
 from python_speech_features import mfcc
 from python_speech_features import delta
 from python_speech_features import logfbank
+import torch
 
 
 def STFT(audio,fs = 16000, window = "hann", t_seg = 0.005, Bark_scale = [0,50,150,250,350,450,570,700,840,1000,1170,1370,1600,1850,2150,2500,2900,3400,4000,4800,5800,7000,8500,10500,13500]):
@@ -111,6 +112,26 @@ def Generate_Features(audio, onsets, fs, features_dict, SNR = 9):
     
     return feature_vector, onsets_resamp
 
+
+def Generate_Batch(n_batch, data, label, length = 1500, shift = 0, computation = 'cuda'):
+  batch_input = np.zeros([n_batch,data[0].shape[0],length])
+  batch_output = np.zeros([n_batch,length])
+  index_list = np.random.choice(np.arange(len(data)),n_batch)
+  for i in range(n_batch):
+    index = index_list[i]
+    sentence = data[index]
+    onset = label[index]
+    if sentence.shape[1] > length:
+      batch_input[i,:,:] = sentence[:,:length]
+      batch_output[i,:] = np.roll(onset[:length],shift)
+    else:
+      batch_input[i,:,:sentence.shape[1]] = sentence[:,:] 
+      batch_output[i,:sentence.shape[1]] = np.roll(onset[:],shift)
+      batch_input[i,:,sentence.shape[1]:] = (np.random.random([sentence.shape[0],length - sentence.shape[1]]) + np.mean(sentence)) * np.std(sentence)
+  #batch_input = torch.Tensor(batch_input.swapaxes(1,2)).to(computation)
+  batch_output = torch.Tensor(batch_output).to(computation)
+  print('Add Noise onto the training data for augmentation')
+  return batch_input, batch_output
             
             
             
