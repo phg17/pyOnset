@@ -8,7 +8,7 @@ Created on Wed Feb  2 17:22:47 2022
 
 import scipy.signal as signal
 import numpy as np
-from utils import Extract_Arguments, resample_label, Add_Noise
+from .utils import Extract_Arguments, resample_label, Add_Noise
 from python_speech_features import mfcc
 from python_speech_features import delta
 from python_speech_features import logfbank
