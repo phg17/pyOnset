@@ -73,5 +73,31 @@ def Extract_Arguments(arg_dict):
 def Default_Args(feat_type):
     return Default_arg[feat_type]
 
+def p2a(peaks, length = 1000):
+    #peaks to array, samplewise
+    output = np.zeros(length)
+    for i in peaks:
+        output[i] = 1
+    return output
+
+def a2p(array):
+    #array to peaks, samplewise
+    output = []
+    for i in range(len(array)):
+        if array[i] > 0:
+            output.append(i)
+    return output
+
+def prob2array(proba_function_batch,height = 0.02, threshold = 0.001, distance = 45, prominence = 0.001):
+    #convert a batch of proba_function to a batch of onsets array
+    peak_list = []
+    for proba_function in proba_function_batch:
+        peak_list.append(signal.find_peaks(proba_function, height =height, threshold = threshold, distance = distance, prominence = prominence)[0])
+    print('Implement Real_time peak generation by symmetry')
+    return peak_list
+    
+    
+
+
 
     

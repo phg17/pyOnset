@@ -8,6 +8,7 @@ Created on Fri Feb  4 18:09:27 2022
 
 import matplotlib.pyplot as plt
 import numpy as np
+from .utils import a2p,p2a
 
 def plot_features(feat_vect,onset_vect = None, samplerate = 16000,vmin=0,vmax=1,shading = 'gouraud',size = [10,5],alpha = 1):
     #Plot feat_vect (n_compo X n_times)
@@ -22,3 +23,43 @@ def plot_features(feat_vect,onset_vect = None, samplerate = 16000,vmin=0,vmax=1,
         ax.plot(np.arange(len(onset_vect))/len(onset_vect)*t[-1] ,onset_vect*(feat_vect.shape[0]-1),'--r',alpha=1)
     fig.set_size_inches(size)
     print('Try to add argdicts to this so that the content is detailed')
+    
+    
+def plot_onsets(onsets_1, onsets_2, proba_function = [], samplerate = 1,size = [10,5], onsets = False):
+    #Plot two onsets, the onsets bool indicate if they are in the form of 
+    #timing list or arrays
+    if onsets:
+        onsets1 = p2a(onsets_1)
+        onsets2 = p2a(onsets_2)
+    else:
+        onsets1 = onsets_1
+        onsets2 = onsets_2
+    fig,ax = plt.subplots()
+    t1 = np.arange(onsets1.shape[0]) / samplerate
+    t2 = np.arange(onsets2.shape[0]) / samplerate
+    ax.plot(t1,onsets1,'k',linewidth = 2)
+    ax.plot(t2,onsets2 * -1,'r',linewidth = 2)
+    if len(proba_function) > 0:
+        t3 = np.arange(len(proba_function)) / samplerate
+        ax.plot(t3, proba_function, 'g')
+    fig.set_size_inches(size)
+    print('Try to add argdicts to this so that the content is detailed')
+    
+
+def plot_differences(differences, bins = 20):
+    #plot the differences with differences in the form of a dictionary with
+    #keys 'FP', 'FN' and 'Match'
+    fig,ax = plt.subplots(2)
+    ax[0].bar(['FP','FN',],[differences['FP'] / (differences['FP'] + len(differences['Match']))* 100,
+                         differences['FN'] / (differences['FN'] + len(differences['Match']))*100],color = 'k')
+    ax[0].set_ylabel('Probability (%)')
+    ax[0].set_title('Missed Onsets')
+    if len(differences['Match']) > 0:
+        ax[1].hist(np.array(differences['Match']), color = 'k', bins = bins)
+        ax[1].set_ylabel('Probability of Delay Occuring')
+        ax[1].set_title('Histogram of Delays')
+    print('Try to add argdicts to this so that the content is detailed')
+    
+    
+    
+    
