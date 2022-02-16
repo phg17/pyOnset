@@ -130,7 +130,7 @@ def Generate_Batch(n_batch, data, label, length = 1500, shift = 0, computation =
       batch_input[i,:,sentence.shape[1]:] = (np.random.random([sentence.shape[0],length - sentence.shape[1]]) + np.mean(sentence)) * np.std(sentence)
   #batch_input = torch.Tensor(batch_input.swapaxes(1,2)).to(computation)
   batch_output = torch.Tensor(batch_output).to(computation)
-  print('Add Noise onto the training data for augmentation')
+  #print('Add Noise onto the training data for augmentation')
   return batch_input, batch_output
             
             

@@ -33,10 +33,10 @@ def distance_onsets(predicted_onsets, true_onsets, onsets = True, cost = 1):
     #wrapper to do spkd over a whole batch
     #if arrays are fed, onsets are computed instead
     distance_list = []
-    for i_batch in range(predicted_onsets.shape[0]):
+    for i_batch in range(len(predicted_onsets)):
         if onsets:
-            current_prediction = predicted_onsets[i_batch,:]
-            current_truth = true_onsets[i_batch,:]
+            current_prediction = predicted_onsets[i_batch]
+            current_truth = true_onsets[i_batch]
         else:
             current_prediction = a2p(predicted_onsets[i_batch,:])
             current_truth = a2p(true_onsets[i_batch,:])
@@ -80,3 +80,19 @@ def differences_timing(s1,s2, cost = 1/12):
         j += 1
     return differences
 
+def differences_batches(batch_output, batch_label):
+    #For two batches, compute the timing differences 
+    differences = dict()
+    differences['Match'] = []
+    differences['FP'] = 0
+    differences['FN'] = 0
+    if len(batch_output) != len(batch_output):
+        raise ValueError('the batches have different sizes')
+    for i in range(len(batch_output)):
+        output = batch_output[i]
+        label = batch_label[i]
+        current_diff = differences_timing(output, label)
+        differences['Match'] += current_diff['Match']
+        differences['FP'] += current_diff['FP']
+        differences['FN'] += current_diff['FN']
+    return differences

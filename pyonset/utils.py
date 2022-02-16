@@ -80,6 +80,13 @@ def p2a(peaks, length = 1000):
         output[i] = 1
     return output
 
+def p2ab(peaks_batch, length = 1000):
+    #p2a on batches
+    output_batch = np.zeros([len(peaks_batch),length])
+    for i in range(len(peaks_batch)):
+        output_batch[i] = p2a(peaks_batch[i])
+    return output_batch
+
 def a2p(array):
     #array to peaks, samplewise
     output = []
@@ -88,6 +95,13 @@ def a2p(array):
             output.append(i)
     return output
 
+def a2pb(array_batch):
+    #array to peaks, samplewise on batches
+    output_batch = []
+    for i in range(len(array_batch)):
+        output_batch.append(a2p(array_batch[i]))
+    return output_batch
+
 def prob2array(proba_function_batch,height = 0.02, threshold = 0.001, distance = 45, prominence = 0.001):
     #convert a batch of proba_function to a batch of onsets array
     peak_list = []
@@ -95,7 +109,8 @@ def prob2array(proba_function_batch,height = 0.02, threshold = 0.001, distance =
         peak_list.append(signal.find_peaks(proba_function, height =height, threshold = threshold, distance = distance, prominence = prominence)[0])
     print('Implement Real_time peak generation by symmetry')
     return peak_list
-    
+
+
     
 
 
