@@ -80,7 +80,7 @@ def differences_timing(s1,s2, cost = 1/12):
         j += 1
     return differences
 
-def differences_batches(batch_output, batch_label):
+def differences_batches(batch_output, batch_label,cost = 1/12):
     #For two batches, compute the timing differences 
     differences = dict()
     differences['Match'] = []
@@ -91,7 +91,7 @@ def differences_batches(batch_output, batch_label):
     for i in range(len(batch_output)):
         output = batch_output[i]
         label = batch_label[i]
-        current_diff = differences_timing(output, label)
+        current_diff = differences_timing(output, label,cost = cost)
         differences['Match'] += current_diff['Match']
         differences['FP'] += current_diff['FP']
         differences['FN'] += current_diff['FN']
